@@ -1,32 +1,37 @@
-<template>
-  <UContainer class="space-y-6">
-    <div>
-      <h1 class="text-2xl font-bold">
-        Dashboard HR
-      </h1>
-      <p class="text-gray-500">
-        Ringkasan data pegawai & presensi
-      </p>
-    </div>
-
-    <DashboardStatCards />
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-      <UCard class="lg:col-span-2">
-        <template #header>
-          <h3 class="font-semibold">
-            Rekap Gaji Bulanan
-          </h3>
-        </template>
-      </UCard>
-
-      <DashboardQuickPanel />
-    </div>
-  </UContainer>
-</template>
-
-<script setup>
+<script setup lang="ts">
 definePageMeta({
   layout: 'default'
 })
+
+const authStore = useAuthStore()
 </script>
+
+<template>
+  <div class="space-y-6">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-800 dark:text-white">
+        Selamat datang, {{ authStore.pegawai?.nama }} 👋
+      </h2>
+      <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">
+        {{ authStore.isAdmin ? 'Administrator — kelola seluruh data pegawai' : 'Dashboard pegawai — data milik kamu' }}
+      </p>
+    </div>
+
+    <!-- Admin view -->
+    <template v-if="authStore.isAdmin">
+      <DashboardStatCard />
+      <DashboardRekapTable />
+      <JabatanSection />
+      <PegawaiSection />
+      <PresensiSection />
+      <LaporanSection />
+    </template>
+
+    <!-- User view -->
+    <template v-else>
+      <DashboardStatCard />
+      <PresensiSection />
+      <DashboardRekapTable />
+    </template>
+  </div>
+</template>
