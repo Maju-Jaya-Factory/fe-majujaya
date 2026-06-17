@@ -1,13 +1,13 @@
 <template>
-  <div class="h-screen overflow-hidden grid lg:grid-cols-2 bg-white dark:bg-gray-900">
-    <!-- Form Login -->
-    <div class="flex items-center justify-center p-6">
-      <div class="w-full max-w-md space-y-6">
-        <div class="space-y-1">
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+  <div class="h-screen overflow-hidden grid lg:grid-cols-2 bg-white">
+    <div class="flex items-center justify-center px-8">
+      <div class="w-full max-w-sm">
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold text-gray-900">
             Selamat Datang 👋
           </h1>
-          <p class="text-sm text-gray-500 dark:text-gray-400">
+
+          <p class="mt-2 text-gray-500">
             Masuk ke akun PT Maju Jaya
           </p>
         </div>
@@ -16,46 +16,92 @@
           v-if="errorMessage"
           color="error"
           variant="subtle"
-          icon="i-heroicons-exclamation-triangle"
-          :title="errorMessage"
+          title="Login gagal"
+          :description="errorMessage"
+          class="mb-4"
         />
 
         <form
-          class="space-y-5"
+          class="space-y-4"
           @submit.prevent="handleSubmit"
         >
-          <UFormField
-            label="Username"
-            name="username"
-          >
+          <UFormField label="Username">
             <UInput
               v-model="form.username"
-              placeholder="Masukkan username"
-              icon="i-heroicons-user"
+              variant="none"
               size="lg"
+              placeholder="Masukkan username"
               class="w-full"
-            />
+              :ui="{
+                base: `
+                  h-11
+                  bg-gray-100
+                  border
+                  border-transparent
+                  rounded-xl
+                  text-sm
+                  focus:border-[#863228]
+                  focus:bg-white
+                  transition-all
+                `
+              }"
+            >
+              <template #leading>
+                <div class="flex items-center">
+                  <CircleUserRound
+                    class="w-4 h-4 text-gray-400"
+                  />
+                </div>
+              </template>
+            </UInput>
           </UFormField>
 
-          <UFormField
-            label="Password"
-            name="password"
-          >
+          <UFormField label="Password">
             <UInput
               v-model="form.password"
               type="password"
-              placeholder="Masukkan password"
-              icon="i-heroicons-lock-closed"
+              variant="none"
               size="lg"
+              placeholder="Masukkan password"
               class="w-full"
-            />
+              :ui="{
+                base: `
+                  h-11
+                  bg-gray-100
+                  border
+                  border-transparent
+                  rounded-xl
+                  text-sm
+                  focus:border-[#863228]
+                  focus:bg-white
+                  transition-all
+                `
+              }"
+            >
+              <template #leading>
+                <div class="flex items-center">
+                  <LockKeyhole
+                    class="w-4 h-4 text-gray-400"
+                  />
+                </div>
+              </template>
+            </UInput>
           </UFormField>
 
           <UButton
             type="submit"
             block
-            size="lg"
             :loading="isLoading"
+            class="
+              cursor-pointer
+              h-11
+              rounded-xl
+              bg-[#863228]
+              hover:bg-[#733022]
+              active:bg-[#5f271d]
+              text-white
+              font-medium
+            "
           >
             Masuk
           </UButton>
@@ -63,20 +109,18 @@
       </div>
     </div>
 
-    <div class="hidden lg:block relative h-screen overflow-hidden">
+    <div class="hidden lg:block relative">
       <NuxtImg
         src="/images/login-bg.png"
         alt="Login Illustration"
         class="absolute inset-0 w-full h-full object-cover"
-        format="webp"
-        quality="80"
-        loading="lazy"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { CircleUserRound, LockKeyhole } from 'lucide-vue-next'
 import type { LoginPayload } from '~/types/auth'
 
 definePageMeta({
@@ -94,11 +138,15 @@ const form = reactive<LoginPayload>({
 const isLoading = ref(false)
 const errorMessage = ref('')
 
-const isFetchError = (err: unknown): err is { data?: { message?: string } } => {
-  return typeof err === 'object' && err !== null && 'data' in err
+const isFetchError = (
+  err: unknown
+): err is { data?: { message?: string } } => {
+  return typeof err === 'object'
+    && err !== null
+    && 'data' in err
 }
 
-const handleSubmit = async (): Promise<void> => {
+const handleSubmit = async () => {
   errorMessage.value = ''
 
   if (!form.username || !form.password) {
@@ -111,7 +159,7 @@ const handleSubmit = async (): Promise<void> => {
   try {
     await login(form)
     await router.push('/dashboard')
-  } catch (err: unknown) {
+  } catch (err) {
     if (isFetchError(err) && err.data?.message) {
       errorMessage.value = err.data.message
     } else {
