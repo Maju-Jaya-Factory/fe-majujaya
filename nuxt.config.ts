@@ -2,14 +2,27 @@
 export default defineNuxtConfig({
   modules: [
     '@nuxt/eslint',
-    '@nuxt/ui'
+    '@nuxt/ui',
+    '@pinia/nuxt',
+    '@nuxt/image',
+    '@nuxt/icon'
   ],
 
   devtools: {
     enabled: true
   },
 
+  devServer: {
+    port: 3001
+  },
+
   css: ['~/assets/css/main.css'],
+
+  runtimeConfig: {
+    public: {
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:3000/api'
+    }
+  },
 
   routeRules: {
     '/': { prerender: true }
